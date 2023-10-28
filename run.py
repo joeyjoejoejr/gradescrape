@@ -6,6 +6,7 @@ from sendgrid.helpers.mail import Mail
 import time
 from dotenv import load_dotenv
 import os
+import difflib
 
 load_dotenv()
 SESSION_KEY = os.environ.get("SESSION_KEY")
@@ -55,11 +56,14 @@ while (True):
                 print(e.message)
         else:
             if (text != previous):
+                before = previous.splitlines(keepends=True)
+                after = text.splitlines(keepends=True)
+                diff = ''.join(difflib.unified_diff(before, after))
                 message = Mail(
-                    from_email='joe@joejackson.me',
-                    to_emails='joe@joejackson.me',
-                    subject=f"Updated grade from class: {name}",
-                    html_content='<strong>There is a change in the grade for this class</strong>')
+                    'joe@joejackson.me',
+                    'joe@joejackson.me',
+                    f"Updated grade from class: {name}",
+                    f'There is a change in the grade for this class\n\n{diff}')
 
                 try:
                     sg.send(message)
